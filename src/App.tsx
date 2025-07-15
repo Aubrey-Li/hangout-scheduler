@@ -34,6 +34,7 @@ function App() {
   const [editingFriend, setEditingFriend] = useState<Friend | null>(null);
   const [loading, setLoading] = useState(true);
   const [importStatus, setImportStatus] = useState<string>('');
+  const [refreshStatus, setRefreshStatus] = useState<string>('');
 
   // Load data on mount
   useEffect(() => {
@@ -177,8 +178,32 @@ function App() {
   };
 
   const handleSnooze = (friendId: string) => {
-    // Remove from current recommendations (will reappear in next cycle)
+    // Remove from current recommendations with a helpful message
     setRecommendations(prev => prev.filter(r => r.friend.id !== friendId));
+    
+    // Optional: You could add a temporary storage here to prevent the same friend 
+    // from appearing in recommendations for a short period (e.g., 24 hours)
+    // This would require storing snooze timestamps in localStorage
+  };
+
+  // Add refresh functionality
+  const handleRefreshRecommendations = async () => {
+    setLoading(true);
+    setRefreshStatus('');
+    try {
+      const recs = await generateRecommendations(friends, hangoutLabels, settings, true);
+      setRecommendations(recs);
+      setRefreshStatus(`✅ Found ${recs.length} new recommendation${recs.length !== 1 ? 's' : ''} scheduled over the next 2 weeks with no overlapping dates!`);
+      
+      // Clear status after 3 seconds
+      setTimeout(() => setRefreshStatus(''), 3000);
+    } catch (error) {
+      console.error('Error refreshing recommendations:', error);
+      setRefreshStatus('❌ Error refreshing recommendations');
+      setTimeout(() => setRefreshStatus(''), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getViewTitle = (view: ViewType): string => {
@@ -274,6 +299,39 @@ function App() {
         {/* Content based on current view */}
         {currentView === 'recommendations' && (
           <div className="space-y-6">
+            {/* Add refresh button */}
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                {recommendations.length > 0 ? (
+                  `${recommendations.length} recommendation${recommendations.length !== 1 ? 's' : ''} found`
+                ) : (
+                  'No recommendations available'
+                )}
+              </div>
+              <button
+                onClick={handleRefreshRecommendations}
+                disabled={loading}
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg 
+                  className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {loading ? 'Refreshing...' : 'Refresh'}
+              </button>
+            </div>
+
+            {/* Refresh status notification */}
+            {refreshStatus && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                {refreshStatus}
+              </div>
+            )}
+
             {recommendations.length > 0 ? (
               recommendations.map((rec) => (
                 <RecommendationCard
@@ -292,14 +350,30 @@ function App() {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No recommendations yet</h3>
                 <p className="text-gray-600 mb-4">
-                  Add some friends and set their hangout preferences to get personalized recommendations!
+                  {friends.length === 0 ? (
+                    'Add some friends and set their hangout preferences to get personalized recommendations!'
+                  ) : (
+                    'No friends need hangouts right now. Try refreshing or adjusting your settings.'
+                  )}
                 </p>
-                <button
-                  onClick={() => setCurrentView('friends')}
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Add Friends
-                </button>
+                <div className="flex gap-3 justify-center">
+                  {friends.length === 0 ? (
+                    <button
+                      onClick={() => setCurrentView('friends')}
+                      className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Add Friends
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleRefreshRecommendations}
+                      disabled={loading}
+                      className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loading ? 'Refreshing...' : 'Refresh Recommendations'}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>

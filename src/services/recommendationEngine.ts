@@ -122,6 +122,21 @@ const generateActivitySuggestions = (
       suggestions.push(randomActivity);
     }
   });
+
+  // If we don't have enough suggestions, add some from other categories
+  if (suggestions.length < 2) {
+    const allActivityKeys = Object.keys(activitySuggestions);
+    const unusedCategories = allActivityKeys.filter(key => !hangoutPreferences.includes(key));
+    
+    while (suggestions.length < 3 && unusedCategories.length > 0) {
+      const randomCategory = unusedCategories.splice(Math.floor(Math.random() * unusedCategories.length), 1)[0];
+      const activities = activitySuggestions[randomCategory] || [];
+      if (activities.length > 0) {
+        const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+        suggestions.push(randomActivity);
+      }
+    }
+  }
   
   // Enhance suggestions based on closeness level
   const enhancedSuggestions = suggestions.map(activity => {
@@ -158,33 +173,115 @@ const calculatePriorityScore = (friend: Friend): number => {
   return timeScore * 0.7 + closenessScore * 0.3;
 };
 
+// Helper function to find next preferred day that's not already taken
+const getNextAvailablePreferredDay = (
+  preferredDays: string[], 
+  startDate: Date, 
+  maxDays: number, 
+  usedDates: Set<string>
+): Date => {
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  
+  // If no preferred days set, find any available day within the range
+  if (preferredDays.length === 0) {
+    for (let i = 1; i <= maxDays; i++) {
+      const checkDate = new Date(startDate);
+      checkDate.setDate(startDate.getDate() + i);
+      const dateStr = checkDate.toISOString().split('T')[0];
+      
+      if (!usedDates.has(dateStr)) {
+        return checkDate;
+      }
+    }
+    // If all days are taken, return a random day (this shouldn't happen often)
+    const randomDays = Math.floor(Math.random() * maxDays) + 1;
+    const result = new Date(startDate);
+    result.setDate(startDate.getDate() + randomDays);
+    return result;
+  }
+  
+  // Find next occurrence of a preferred day that's not already taken
+  for (let i = 1; i <= maxDays; i++) {
+    const checkDate = new Date(startDate);
+    checkDate.setDate(startDate.getDate() + i);
+    const dayName = dayNames[checkDate.getDay()];
+    const dateStr = checkDate.toISOString().split('T')[0];
+    
+    if (preferredDays.includes(dayName) && !usedDates.has(dateStr)) {
+      return checkDate;
+    }
+  }
+  
+  // If no preferred day is available, find any available day
+  for (let i = 1; i <= maxDays; i++) {
+    const checkDate = new Date(startDate);
+    checkDate.setDate(startDate.getDate() + i);
+    const dateStr = checkDate.toISOString().split('T')[0];
+    
+    if (!usedDates.has(dateStr)) {
+      return checkDate;
+    }
+  }
+  
+  // If all days are taken within the preferred range, try extending the search slightly
+  for (let i = maxDays + 1; i <= maxDays + 7; i++) {
+    const checkDate = new Date(startDate);
+    checkDate.setDate(startDate.getDate() + i);
+    const dateStr = checkDate.toISOString().split('T')[0];
+    
+    if (!usedDates.has(dateStr)) {
+      return checkDate;
+    }
+  }
+  
+  // Final fallback - return a random day (this should rarely happen)
+  const randomDays = Math.floor(Math.random() * maxDays) + 1;
+  const result = new Date(startDate);
+  result.setDate(startDate.getDate() + randomDays);
+  return result;
+};
+
 // Generate recommendations for all friends
 export const generateRecommendations = async (
   friends: Friend[],
   hangoutLabels: HangoutLabel[],
-  settings: AppSettings
+  settings: AppSettings,
+  forceRefresh: boolean = false
 ): Promise<HangoutRecommendation[]> => {
   const recommendations: HangoutRecommendation[] = [];
+  const usedDates = new Set<string>(); // Track already assigned dates
   
   for (const friend of friends) {
     const daysSince = daysSinceLastHangout(friend.lastHangout);
     const recommendedFreq = getRecommendedFrequency(friend.closeness);
     
-    // Only recommend if it's been long enough since last hangout
-    if (daysSince >= recommendedFreq) {
+    // More flexible criteria for recommendations
+    const shouldRecommend = forceRefresh || 
+      daysSince >= recommendedFreq || 
+      daysSince >= recommendedFreq * 0.7; // 70% of recommended frequency
+    
+    if (shouldRecommend) {
       const activities = generateActivitySuggestions(friend, hangoutLabels);
       
-      // Calculate next hangout date (within next week, weighted by closeness)
+      // Calculate next hangout date (within next 2 weeks, considering preferred days and avoiding conflicts)
       const nextDate = new Date();
-      const daysToAdd = friend.closeness >= 7 ? 
-        Math.floor(Math.random() * 3) + 1 : // 1-3 days for close friends
-        Math.floor(Math.random() * 7) + 1;   // 1-7 days for others
-      nextDate.setDate(nextDate.getDate() + daysToAdd);
+      
+      // Prioritize closer friends for earlier dates
+      const maxDaysForFriend = friend.closeness >= 7 ? 7 : 14; // Close friends: 1 week, others: 2 weeks
+      const scheduledDate = getNextAvailablePreferredDay(settings.preferredDays, nextDate, maxDaysForFriend, usedDates);
+      
+      // Mark this date as used
+      const dateStr = scheduledDate.toISOString().split('T')[0];
+      usedDates.add(dateStr);
       
       // Generate reason based on timing and closeness
       let reason: string;
       if (daysSince >= recommendedFreq * 2) {
         reason = `It's been ${daysSince} days since you last hung out - time to reconnect!`;
+      } else if (daysSince >= recommendedFreq) {
+        reason = `It's been ${daysSince} days since you last hung out - time to reconnect!`;
+      } else if (forceRefresh) {
+        reason = `It's been ${daysSince} days since you last hung out. A hangout would be nice!`;
       } else if (friend.closeness >= 8) {
         reason = `You're very close friends - regular hangouts keep the friendship strong!`;
       } else if (friend.closeness >= 6) {
@@ -196,23 +293,64 @@ export const generateRecommendations = async (
       recommendations.push({
         friend,
         suggestedActivities: activities,
-        nextHangoutDate: nextDate.toISOString().split('T')[0],
+        nextHangoutDate: dateStr,
         reason
       });
     }
   }
   
-  // Sort by priority (highest score first)
+  // Sort by priority (highest score first) and then by date (earlier first)
   const sortedRecommendations = recommendations.sort((a, b) => {
     const scoreA = calculatePriorityScore(a.friend);
     const scoreB = calculatePriorityScore(b.friend);
-    return scoreB - scoreA;
+    
+    // Primary sort: by priority score
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA;
+    }
+    
+    // Secondary sort: by date (earlier dates first)
+    const dateA = new Date(a.nextHangoutDate);
+    const dateB = new Date(b.nextHangoutDate);
+    return dateA.getTime() - dateB.getTime();
   });
 
-  // Limit recommendations based on weekly hangout target
-  // Show at most the weekly target number of recommendations
-  const weeklyLimit = Math.max(1, settings.weeklyHangoutTarget);
-  return sortedRecommendations.slice(0, weeklyLimit);
+  // Respect weekly hangout target by distributing recommendations across 2 weeks
+  const maxRecommendations = forceRefresh ? 
+    Math.min(settings.weeklyHangoutTarget * 2, 8) : // Max 2 weeks worth, cap at 8
+    Math.max(1, settings.weeklyHangoutTarget);
+  
+  // Further filter to ensure we don't exceed weekly target in any given week
+  const finalRecommendations: HangoutRecommendation[] = [];
+  const weeklyCount = { week1: 0, week2: 0 };
+  const today = new Date();
+  const oneWeekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  for (const rec of sortedRecommendations) {
+    if (finalRecommendations.length >= maxRecommendations) break;
+    
+    const recDate = new Date(rec.nextHangoutDate);
+    const isWeek1 = recDate <= oneWeekFromNow;
+    
+    // Since dates are already unique and optimally distributed, we can be more flexible with weekly limits
+    if (isWeek1 && weeklyCount.week1 < settings.weeklyHangoutTarget) {
+      finalRecommendations.push(rec);
+      weeklyCount.week1++;
+    } else if (!isWeek1 && weeklyCount.week2 < settings.weeklyHangoutTarget) {
+      finalRecommendations.push(rec);
+      weeklyCount.week2++;
+    } else if (forceRefresh && finalRecommendations.length < maxRecommendations) {
+      // For force refresh, allow some flexibility with weekly limits since dates don't overlap
+      finalRecommendations.push(rec);
+      if (isWeek1) {
+        weeklyCount.week1++;
+      } else {
+        weeklyCount.week2++;
+      }
+    }
+  }
+  
+  return finalRecommendations;
 };
 
 // Update friend's last hangout date

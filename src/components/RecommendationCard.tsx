@@ -18,11 +18,25 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
-      weekday: 'short',
+      weekday: 'long',
       month: 'short',
       day: 'numeric'
     });
   };
+
+  const getDateStatus = (dateString: string): { text: string; color: string } => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const diffTime = date.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return { text: 'Today', color: 'text-red-600 bg-red-50' };
+    if (diffDays === 1) return { text: 'Tomorrow', color: 'text-orange-600 bg-orange-50' };
+    if (diffDays <= 7) return { text: `In ${diffDays} days`, color: 'text-green-600 bg-green-50' };
+    return { text: `In ${diffDays} days`, color: 'text-blue-600 bg-blue-50' };
+  };
+
+  const dateStatus = getDateStatus(nextHangoutDate);
 
   const handleMarkAsHungOut = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -37,8 +51,13 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
           <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
           <span className="text-sm font-medium text-blue-700">Recommended Hangout</span>
         </div>
-        <div className="text-sm text-gray-600">
-          Suggested for {formatDate(nextHangoutDate)}
+        <div className="flex flex-col items-end gap-1">
+          <div className="text-sm font-medium text-gray-900">
+            {formatDate(nextHangoutDate)}
+          </div>
+          <div className={`text-xs px-2 py-1 rounded-full ${dateStatus.color}`}>
+            {dateStatus.text}
+          </div>
         </div>
       </div>
 
