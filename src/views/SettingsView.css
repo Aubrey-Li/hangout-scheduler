@@ -1,0 +1,261 @@
+/* SettingsView Styles */
+
+.settings-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  padding: 1.5rem;
+}
+
+.settings-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Weekly Hangout Target */
+.setting-item label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+  margin-bottom: 0.5rem;
+}
+
+.setting-range-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.setting-range-input {
+  flex: 1;
+}
+
+.setting-range-value {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgb(147 51 234);
+  min-width: 3rem;
+}
+
+.setting-description {
+  font-size: 0.875rem;
+  color: rgb(107 114 128);
+  margin-top: 0.25rem;
+}
+
+/* Preferred Days */
+.preferred-days-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .preferred-days-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.day-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.day-checkbox {
+  border-radius: 0.25rem;
+  color: rgb(147 51 234);
+}
+
+.day-checkbox:focus {
+  outline: 2px solid rgb(147 51 234);
+  outline-offset: 2px;
+}
+
+.day-text {
+  font-size: 0.875rem;
+}
+
+/* Data Backup & Restore */
+.backup-section {
+  padding-top: 1rem;
+  border-top: 1px solid rgb(229 231 235);
+}
+
+.backup-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgb(17 24 39);
+  margin-bottom: 0.75rem;
+}
+
+.backup-actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.backup-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .backup-buttons {
+    flex-direction: row;
+  }
+}
+
+.export-button {
+  flex: 1;
+  background-color: rgb(37 99 235);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.export-button:hover {
+  background-color: rgb(29 78 216);
+}
+
+.import-container {
+  flex: 1;
+}
+
+.import-file-input {
+  display: none;
+}
+
+.import-button {
+  width: 100%;
+  background-color: rgb(34 197 94);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.import-button:hover {
+  background-color: rgb(22 163 74);
+}
+
+.backup-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.import-status {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.import-status.success {
+  background-color: rgb(240 253 244);
+  color: rgb(22 101 52);
+}
+
+.import-status.error {
+  background-color: rgb(254 242 242);
+  color: rgb(153 27 27);
+}
+
+.import-status.info {
+  background-color: rgb(239 246 255);
+  color: rgb(30 64 175);
+}
+
+.backup-info {
+  font-size: 0.875rem;
+  color: rgb(75 85 99);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Stats */
+.stats-section {
+  padding-top: 1rem;
+  border-top: 1px solid rgb(229 231 235);
+}
+
+.stats-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgb(17 24 39);
+  margin-bottom: 0.75rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.stat-card.purple {
+  background-color: rgb(250 245 255);
+}
+
+.stat-card.blue {
+  background-color: rgb(239 246 255);
+}
+
+.stat-card.green {
+  background-color: rgb(240 253 244);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stat-value.purple {
+  color: rgb(147 51 234);
+}
+
+.stat-value.blue {
+  color: rgb(37 99 235);
+}
+
+.stat-value.green {
+  color: rgb(34 197 94);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: rgb(75 85 99);
+} 

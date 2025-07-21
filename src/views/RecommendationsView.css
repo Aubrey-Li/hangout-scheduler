@@ -1,0 +1,135 @@
+/* RecommendationsView Styles */
+
+.recommendations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recommendations-status {
+  font-size: 0.875rem;
+  color: rgb(75 85 99);
+}
+
+.refresh-button {
+  background-color: rgb(147 51 234);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: rgb(126 34 206);
+}
+
+.refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-button-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.refresh-button-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.refresh-notification {
+  background-color: rgb(239 246 255);
+  border: 1px solid rgb(191 219 254);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: rgb(30 64 175);
+}
+
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Empty State */
+.recommendations-empty-state {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.empty-state-icon-container {
+  width: 6rem;
+  height: 6rem;
+  background-color: rgb(243 244 246);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.empty-state-icon {
+  width: 3rem;
+  height: 3rem;
+  color: rgb(156 163 175);
+}
+
+.empty-state-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgb(17 24 39);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+  color: rgb(75 85 99);
+  margin-bottom: 1rem;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.empty-state-button {
+  background-color: rgb(147 51 234);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.empty-state-button:hover {
+  background-color: rgb(126 34 206);
+}
+
+.empty-state-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} 

@@ -6,13 +6,15 @@ interface FriendFormProps {
   onSubmit: (friend: Omit<Friend, 'id'>) => void;
   onCancel: () => void;
   hangoutLabels: string[];
+  isRemoteContext?: boolean; // Whether we're adding from the remote friends view
 }
 
 const FriendForm: React.FC<FriendFormProps> = ({ 
   friend, 
   onSubmit, 
   onCancel, 
-  hangoutLabels 
+  hangoutLabels,
+  isRemoteContext = false
 }) => {
   const [formData, setFormData] = useState({
     name: friend?.name || '',
@@ -25,7 +27,10 @@ const FriendForm: React.FC<FriendFormProps> = ({
     twitter: friend?.socials?.twitter || '',
     instagram: friend?.socials?.instagram || '',
     linkedin: friend?.socials?.linkedin || '',
-    hangoutPreferences: friend?.hangoutPreferences || []
+    hangoutPreferences: friend?.hangoutPreferences || [],
+    isRemote: friend?.isRemote || isRemoteContext,
+    location: friend?.location || '',
+    connectionPreferences: friend?.connectionPreferences || []
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -44,7 +49,10 @@ const FriendForm: React.FC<FriendFormProps> = ({
         instagram: formData.instagram || undefined,
         linkedin: formData.linkedin || undefined,
       },
-      hangoutPreferences: formData.hangoutPreferences
+      hangoutPreferences: formData.hangoutPreferences,
+      isRemote: formData.isRemote,
+      location: formData.location || undefined,
+      connectionPreferences: formData.connectionPreferences
     };
     
     onSubmit(newFriend);
@@ -194,9 +202,67 @@ const FriendForm: React.FC<FriendFormProps> = ({
             </div>
           </div>
 
+          {/* Remote Friend Section */}
+          <div className="border-t pt-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <input
+                type="checkbox"
+                checked={formData.isRemote}
+                onChange={(e) => setFormData(prev => ({ ...prev, isRemote: e.target.checked }))}
+                className="rounded text-blue-600 focus:ring-blue-500"
+              />
+              <label className="text-sm font-medium text-gray-700">
+                This is a remote friend (long-distance)
+              </label>
+            </div>
+
+            {formData.isRemote && (
+              <div className="space-y-4 bg-blue-50 p-4 rounded-lg">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location (City, State/Country)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., San Francisco, CA"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preferred Connection Methods
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['Phone calls', 'Video calls', 'Text messages', 'Social media', 'Email', 'Visiting each other'].map((method) => (
+                      <label key={method} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.connectionPreferences.includes(method)}
+                          onChange={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              connectionPreferences: prev.connectionPreferences.includes(method)
+                                ? prev.connectionPreferences.filter(p => p !== method)
+                                : [...prev.connectionPreferences, method]
+                            }));
+                          }}
+                          className="rounded text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm">{method}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Hangout Preferences
+              {formData.isRemote ? 'Activity Interests (for when visiting)' : 'Hangout Preferences'}
             </label>
             <div className="grid grid-cols-2 gap-2">
               {hangoutLabels.map((label) => (

@@ -251,7 +251,10 @@ export const generateRecommendations = async (
   const recommendations: HangoutRecommendation[] = [];
   const usedDates = new Set<string>(); // Track already assigned dates
   
-  for (const friend of friends) {
+  // Filter out remote friends - they don't get recommendations
+  const localFriends = friends.filter(friend => !friend.isRemote);
+  
+  for (const friend of localFriends) {
     const daysSince = daysSinceLastHangout(friend.lastHangout);
     const recommendedFreq = getRecommendedFrequency(friend.closeness);
     

@@ -1,6 +1,7 @@
 import React from 'react';
 import { HangoutRecommendation } from '../types/index';
 import FriendCard from './FriendCard.tsx';
+import './RecommendationCard.css';
 
 interface RecommendationCardProps {
   recommendation: HangoutRecommendation;
@@ -24,16 +25,16 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     });
   };
 
-  const getDateStatus = (dateString: string): { text: string; color: string } => {
+  const getDateStatus = (dateString: string): { text: string; className: string } => {
     const date = new Date(dateString);
     const today = new Date();
     const diffTime = date.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return { text: 'Today', color: 'text-red-600 bg-red-50' };
-    if (diffDays === 1) return { text: 'Tomorrow', color: 'text-orange-600 bg-orange-50' };
-    if (diffDays <= 7) return { text: `In ${diffDays} days`, color: 'text-green-600 bg-green-50' };
-    return { text: `In ${diffDays} days`, color: 'text-blue-600 bg-blue-50' };
+    if (diffDays === 0) return { text: 'Today', className: 'date-status-today' };
+    if (diffDays === 1) return { text: 'Tomorrow', className: 'date-status-tomorrow' };
+    if (diffDays <= 7) return { text: `In ${diffDays} days`, className: 'date-status-this-week' };
+    return { text: `In ${diffDays} days`, className: 'date-status-later' };
   };
 
   const dateStatus = getDateStatus(nextHangoutDate);
@@ -43,78 +44,78 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     onMarkAsHungOut(friend.id, today);
   };
 
-  return (
-    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 border-2 border-blue-200 shadow-lg">
+    return (
+    <div className="recommendation-card">
       {/* Header with priority indicator */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-          <span className="text-sm font-medium text-blue-700">Recommended Hangout</span>
+      <div className="recommendation-header">
+        <div className="recommendation-priority">
+          <div className="priority-indicator"></div>
+          <span className="priority-label">Recommended Hangout</span>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <div className="text-sm font-medium text-gray-900">
+        <div className="recommendation-date-info">
+          <div className="recommendation-date">
             {formatDate(nextHangoutDate)}
           </div>
-          <div className={`text-xs px-2 py-1 rounded-full ${dateStatus.color}`}>
+          <div className={`date-status-badge ${dateStatus.className}`}>
             {dateStatus.text}
           </div>
         </div>
       </div>
 
       {/* Friend Card */}
-      <div className="mb-4">
+      <div className="friend-card-container">
         <FriendCard friend={friend} showActions={false} />
       </div>
 
       {/* Recommendation Reason */}
-      <div className="mb-4 p-3 bg-white rounded-lg border border-blue-100">
-        <div className="flex items-start gap-2">
-          <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="recommendation-reason">
+        <div className="reason-content">
+          <svg className="reason-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <div>
-            <h4 className="font-medium text-gray-900 mb-1">Why now?</h4>
-            <p className="text-sm text-gray-700">{reason}</p>
+          <div className="reason-text-container">
+            <h4>Why now?</h4>
+            <p className="reason-text">{reason}</p>
           </div>
         </div>
       </div>
 
       {/* Suggested Activities */}
-      <div className="mb-6">
-        <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="activities-section">
+        <h4 className="activities-header">
+          <svg className="activities-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
           </svg>
           Suggested Activities
         </h4>
-        <div className="space-y-2">
+        <div className="activities-list">
           {suggestedActivities.map((activity, index) => (
-            <div key={index} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-purple-100">
-              <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            <div key={index} className="activity-item">
+              <div className="activity-number">
                 {index + 1}
               </div>
-              <p className="text-sm text-gray-700 flex-1">{activity}</p>
+              <p className="activity-text">{activity}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3">
+      <div className="recommendation-actions">
         <button
           onClick={handleMarkAsHungOut}
-          className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+          className="action-button mark-hung-out-button"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="action-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           Mark as Hung Out
         </button>
         <button
           onClick={() => onSnooze(friend.id)}
-          className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 text-white py-2 px-4 rounded-lg hover:from-gray-500 hover:to-gray-600 transition-all duration-200 font-medium flex items-center justify-center gap-2"
+          className="action-button snooze-button"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="action-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Snooze

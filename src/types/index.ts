@@ -13,6 +13,9 @@ export interface Friend {
   closeness: number; // 1-10 scale
   lastHangout?: string;
   hangoutPreferences: string[];
+  isRemote?: boolean; // Whether this is a remote friend
+  location?: string; // City/location for remote friends
+  connectionPreferences?: string[]; // Preferred ways to connect remotely
 }
 
 export interface HangoutLabel {

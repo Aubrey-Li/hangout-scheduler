@@ -1,0 +1,233 @@
+/* FriendForm Component Styles */
+
+.friend-form-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+
+.friend-form-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  max-width: 42rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.friend-form-header {
+  padding: 1.5rem 1.5rem 0;
+  border-bottom: 1px solid rgb(229 231 235);
+  margin-bottom: 1.5rem;
+}
+
+.friend-form-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgb(17 24 39);
+}
+
+.friend-form-content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: rgb(59 130 246);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+}
+
+.form-textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.form-range-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.form-range-input {
+  flex: 1;
+}
+
+.form-range-value {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: rgb(59 130 246);
+  min-width: 3rem;
+  text-align: center;
+}
+
+.closeness-description {
+  font-size: 0.75rem;
+  color: rgb(107 114 128);
+  margin-top: 0.25rem;
+}
+
+.socials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.remote-friend-section {
+  border-top: 1px solid rgb(229 231 235);
+  padding-top: 1.5rem;
+}
+
+.remote-friend-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.remote-friend-checkbox input {
+  border-radius: 0.25rem;
+  color: rgb(59 130 246);
+}
+
+.remote-friend-checkbox input:focus {
+  ring: 2px;
+  ring-color: rgb(59 130 246);
+}
+
+.remote-friend-checkbox label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+  margin: 0;
+}
+
+.remote-friend-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: rgb(239 246 255);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.connection-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.connection-method-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connection-method-checkbox input {
+  border-radius: 0.25rem;
+  color: rgb(59 130 246);
+}
+
+.connection-method-checkbox input:focus {
+  ring: 2px;
+  ring-color: rgb(59 130 246);
+}
+
+.connection-method-checkbox span {
+  font-size: 0.875rem;
+}
+
+.preferences-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.preference-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.preference-checkbox input {
+  border-radius: 0.25rem;
+  color: rgb(59 130 246);
+}
+
+.preference-checkbox input:focus {
+  ring: 2px;
+  ring-color: rgb(59 130 246);
+}
+
+.preference-checkbox span {
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(229 231 235);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.form-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.form-button-primary {
+  background-color: rgb(59 130 246);
+  color: white;
+}
+
+.form-button-primary:hover {
+  background-color: rgb(37 99 235);
+}
+
+.form-button-secondary {
+  background-color: rgb(243 244 246);
+  color: rgb(55 65 81);
+}
+
+.form-button-secondary:hover {
+  background-color: rgb(229 231 235);
+} 
